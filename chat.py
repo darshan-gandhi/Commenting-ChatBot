@@ -31,6 +31,30 @@ def find_parent(pid):
 		print("Error is there")
 		return False
 
+def find_score(pid):
+	try:
+		sql="SELECT score FROM parent_reply WHERE parent_id= '{}' LIMIT 1"
+		c.execute(sql)
+		result=c.fetchone()
+		if result!= None:
+			return result[0]
+		else: 
+			return False
+
+	except Exception as e:
+		return False
+
+
+def acceptable(data):
+	if len(data.split(' ')) > 50 or len(data) < 1:
+		return False
+	elif len(data)>1000  : 
+		return False
+	elif data= '[deleted]' or data='[removed]' : 
+		return False
+	else: 
+		return True
+
 if  __name__ == "__main__" :
 	create_table()
 	row_counter=0 
@@ -38,7 +62,6 @@ if  __name__ == "__main__" :
 
 	with open("RC_2015-01", buffering=1000) as f:
 		for row in f:
-			print(row)
 			row_counter+=1
 			row=json.loads(row)
 			parent_id=row['parent_id']
@@ -48,3 +71,11 @@ if  __name__ == "__main__" :
 			subreddit=row['subreddit']
 
 			parent_data=find_parent(parent_id)
+
+			if score>=2:
+				existing_comment_score= find_score(parent_id)
+
+				if existing_comment_score:
+					if score > existing_comment_score:
+
+
